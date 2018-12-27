@@ -11,7 +11,14 @@ object CF1076b extends App {
     }
   }
 
+  def solve(n: Long) : Long = {
+    if (n % 2 == 0) { n/2 }
+    else {
+      solve(n-findPrime(n)) + 1
+    }
+  }
+
   val n = in.nextLong
-  out.println(n/findPrime(n))
+  out.println(solve(n))
   out.flush;out.close;
 }

@@ -79,6 +79,6 @@ object CF1076c extends App {
   // remainEdges foreach println
   val result = orderBy(remainEdges, edges)
   out.println(result.length)
-  out.println(result.mkString(" "))
+  out.println(result.map(_+1).mkString(" "))
   out.flush;out.close;
 }

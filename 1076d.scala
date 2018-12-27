@@ -5,12 +5,14 @@ object CF1076c extends App {
   import scala.math._
   import scala.collection.mutable.{Queue, HashSet, HashMap}
 
-  def edgeToList(edges: Seq[(Int, Int, Long)]) : Array[List[(Int, Long)]] = {
+  def edgeToList(edges: Seq[(Int, Int, Long)], direction: Boolean = false) : Array[List[(Int, Long)]] = {
     val acc = Array.fill[List[(Int, Long)]](n)(List())
     edges foreach ((z) => {
       val (x,y,w) = z
       acc(x) = (y, w)::acc(x)
-      acc(y) = (x, w)::acc(y)
+      if (!direction) {
+        acc(y) = (x, w)::acc(y)
+      }
     })
     acc
   }
@@ -40,7 +42,8 @@ object CF1076c extends App {
   }
 
   def bfs(tree: Seq[(Int, Long)], k: Int) : List[(Int, Int)] = {
-    val nodeList = edgeToList(tree.zipWithIndex.map({case ((y, w), x) => (x, y, w)}))
+    val nodeList = edgeToList(tree.zipWithIndex.drop(1).map({case ((y, w), x) => (y, x, w)}), true)
+    // nodeList foreach println
     val queue = Queue(0)
     var result = List[(Int, Int)]()
     while (queue.nonEmpty) {
@@ -57,7 +60,7 @@ object CF1076c extends App {
   def orderBy(edges: Seq[(Int, Int)], allEdges: Seq[(Int, Int, Long)]) : List[Int] = {
     val map = HashMap[(Int, Int), Int]()
     allEdges.zipWithIndex.foreach({
-      case ((x, y, _), i) => map += ((x, y) -> i)
+      case ((x, y, _), i) => map += ((x, y) -> i); map += ((y, x) -> i)
     })
     edges.map(map(_)).toList.sorted
   }
@@ -71,7 +74,9 @@ object CF1076c extends App {
   val nodeEdges = edgeToList(edges)
   // nodeEdges foreach (println(_))
   val tree = shortest(n, nodeEdges)
-  val remainEdges = bfs(tree, k)
+  // tree foreach println
+  val remainEdges = bfs(tree, 10)
+  // remainEdges foreach println
   val result = orderBy(remainEdges, edges)
   out.println(result.length)
   out.println(result.mkString(" "))

@@ -3,7 +3,7 @@ object CF1076d extends App {
   val out = new java.io.PrintWriter(System.out)
 
   import scala.math._
-  import scala.collection.mutable.{Queue, HashSet, HashMap}
+  import scala.collection.mutable.{Queue, HashSet, HashMap, ListBuffer}
 
   def edgeToList(edges: Seq[(Int, Int, Long)], direction: Boolean = false) : Array[List[(Int, Long)]] = {
     val acc = Array.fill[List[(Int, Long)]](n)(List())
@@ -43,13 +43,13 @@ object CF1076d extends App {
     val nodeList = edgeToList(tree.zipWithIndex.drop(1).map({case ((y, w), x) => (y, x, w)}), true)
     // nodeList foreach println
     val queue = Queue(0)
-    var result = List[(Int, Int)]()
+    var result = ListBuffer[(Int, Int)]()
     while (queue.nonEmpty && result.length < k) {
       val x = queue.dequeue
       queue ++= nodeList(x).map(_._1)
-      result = result ++ nodeList(x).map((z) => {(z._1, x)})
+      result ++= nodeList(x).map((z) => {(z._1, x)})
     }
-    return result.take(k);
+    return result.toList.take(k);
   }
 
   def orderBy(edges: Seq[(Int, Int)], allEdges: Seq[(Int, Int, Long)]) : List[Int] = {
@@ -61,19 +61,31 @@ object CF1076d extends App {
   }
 
   val (n, m, k) = (in.nextInt, in.nextInt, in.nextInt)
+  // val startTime = System.currentTimeMillis()
   val edges = 1 to m map ((_: Int) => {
     val (x, y, w) = (in.nextInt, in.nextInt, in.nextLong)
     (x-1, y-1, w)
   })
+  // println("edges:", System.currentTimeMillis()-startTime)
   // edges foreach (println(_))
+
   val nodeEdges = edgeToList(edges)
+  // println("nodeEdges:", System.currentTimeMillis()-startTime)
   // nodeEdges foreach (println(_))
+
   val tree = shortest(n, nodeEdges)
+  // println("spfa:", System.currentTimeMillis()-startTime)
   // tree foreach println
+
   val remainEdges = bfs(tree, k)
+  // println("bfs:", System.currentTimeMillis()-startTime)
   // remainEdges foreach println
+
   val result = orderBy(remainEdges, edges)
+  // println("order:", System.currentTimeMillis()-startTime)
+
   out.println(result.length)
   out.println(result.map(_+1).mkString(" "))
+  // println("mkString:", System.currentTimeMillis()-startTime)
   out.flush;out.close;
 }

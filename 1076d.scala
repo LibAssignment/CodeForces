@@ -1,4 +1,4 @@
-object CF1076c extends App {
+object CF1076d extends App {
   val in = new java.util.Scanner(System.in)
   val out = new java.io.PrintWriter(System.out)
 
@@ -27,13 +27,11 @@ object CF1076c extends App {
     while (queue.nonEmpty) {
       val x = queue.dequeue
       set remove x
-      edges(x) foreach ((z) => {
-        val (y, w) = z
+      edges(x) foreach ({case (y, w) =>
         if (result(x)._2 + w < result(y)._2) {
           result(y) = (x, result(x)._2 + w)
-          if (!(set contains y)) {
-            set += y
-            queue += y
+          if (set add y) {
+            queue enqueue y
           }
         }
       })
@@ -46,15 +44,12 @@ object CF1076c extends App {
     // nodeList foreach println
     val queue = Queue(0)
     var result = List[(Int, Int)]()
-    while (queue.nonEmpty) {
-      if (result.length >= k) {
-        return result.take(k)
-      }
+    while (queue.nonEmpty && result.length < k) {
       val x = queue.dequeue
       queue ++= nodeList(x).map(_._1)
       result = result ++ nodeList(x).map((z) => {(z._1, x)})
     }
-    return result;
+    return result.take(k);
   }
 
   def orderBy(edges: Seq[(Int, Int)], allEdges: Seq[(Int, Int, Long)]) : List[Int] = {
@@ -75,7 +70,7 @@ object CF1076c extends App {
   // nodeEdges foreach (println(_))
   val tree = shortest(n, nodeEdges)
   // tree foreach println
-  val remainEdges = bfs(tree, 10)
+  val remainEdges = bfs(tree, k)
   // remainEdges foreach println
   val result = orderBy(remainEdges, edges)
   out.println(result.length)

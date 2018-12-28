@@ -9,20 +9,20 @@ typedef vector<vector<pair<int, int>>> update_type;
 typedef vector<vector<int>> edge_type;
 typedef int node_ptr;
 
+const int M = 20*300020;
 struct node {
   node_ptr pl, pr;
   int l, r;
   long long data;
-} empty_node[5*20*300020]; // M*log_2(M)*4
+} empty_node[M]; // M*log_2(M)*4
 // vector<node> empty_node(5*20*300020);
 
 node_ptr make_node(int l, int r) {
   // cerr << "making: " << l << ", " << r << endl;
   static int p = 1;
-  // if (p >= empty_node.size()) {
-  //   cerr << "double size" << endl;
-  //   empty_node.resize(empty_node.size()*2);
-  // }
+  if (p >= M) {
+    cerr << "overflow" << endl;
+  }
   empty_node[p].l = l, empty_node[p].r = r;
   return p++;
 }
@@ -39,15 +39,11 @@ void update(node& head, int left, int right, int data) {
   }
   int m = (head.l + head.r) / 2; // [left, m], [m+1, right]
   if (left <= m) {
-    node_ptr pl = head.pl;
-    head.pl = make_node(head.l, m);
-    if (pl) get_node(head.pl) = get_node(pl);
+    if (!head.pl) head.pl = make_node(head.l, m);
     update(get_node(head.pl), left, right, data);
   }
   if (right > m) {
-    node_ptr pr = head.pr;
-    head.pr = make_node(m+1, head.r);
-    if (pr) get_node(head.pr) = get_node(pr);
+    if (!head.pr) head.pr = make_node(m+1, head.r);
     update(get_node(head.pr), left, right, data);
   }
 }
@@ -71,11 +67,10 @@ void dump(const node& head) {
   if (head.pr) dump(get_node(head.pr));
 }
 
-void do_dfs(vector<long long>& result, int depth, int parent, int now, const node& prev_head,
+void do_dfs(vector<long long>& result, int depth, int parent, int now, node& head,
             const edge_type& edges, const update_type& updates) {
   // cerr << "dfs: " << now << endl;
-  // dump(prev_head);
-  node head = prev_head;
+  // dump(head);
   for (auto u : updates.at(now)) {
     // cerr << "updating " << depth << " " << depth+u.first << " " << u.second << endl;
     update(head, depth, depth+u.first, u.second);
@@ -84,6 +79,10 @@ void do_dfs(vector<long long>& result, int depth, int parent, int now, const nod
   for (int v : edges.at(now)) {
     if (v != parent)
       do_dfs(result, depth+1, now, v, head, edges, updates);
+  }
+  for (auto u : updates.at(now)) {
+    // cerr << "updating " << depth << " " << depth+u.first << " " << u.second << endl;
+    update(head, depth, depth+u.first, -u.second);
   }
 }
 

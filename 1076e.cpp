@@ -24,20 +24,20 @@ shared_ptr<node> make_node(int l, int r) {
 
 void update(node& head, int left, int right, int data) {
   // cerr<< "low(" << left << " " << right << "): " << head.l << "," << head.r << "," << data << endl;
-  if (head.l == left && head.r == right) { // assert left == head.l && right == head.r
+  if (left <= head.l && head.r <= right) {
     head.data += data;
     return;
   }
   int m = (head.l + head.r) / 2; // [left, m], [m+1, right]
   if (left <= m) {
-    if (!head.pl) head.pl = make_node(left, m);
+    if (!head.pl) head.pl = make_node(head.l, m);
     head.pl = make_shared<node>(*head.pl);
-    update(*head.pl, left, min(m, right), data);
+    update(*head.pl, left, right, data);
   }
   if (right > m) {
-    if (!head.pr) head.pr = make_node(m+1, right);
+    if (!head.pr) head.pr = make_node(m+1, head.r);
     head.pr = make_shared<node>(*head.pr);
-    update(*head.pr, max(left, m+1), right, data);
+    update(*head.pr, left, right, data);
   }
 }
 
@@ -69,11 +69,11 @@ void do_dfs(vector<long long>& result, int depth, int parent, int now, const nod
     // cerr << "updating " << depth << depth+u.first << u.second << endl;
     update(head, depth, depth+u.first, u.second);
   }
+  result[now] = query(head, depth);
   for (int v : edges.at(now)) {
     if (v != parent)
       do_dfs(result, depth+1, now, v, head, edges, updates);
   }
-  result[now] = query(head, depth);
 }
 
 vector<long long> dfs(int n, const map<int, vector<int>>& edges, const update_type& updates) {

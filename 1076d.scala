@@ -26,7 +26,7 @@ object CF1076d extends App {
     def nextDouble(): Double = next().toDouble
     def nextBigDecimal(): BigDecimal = BigDecimal(next())
   }
-  val startTime = System.currentTimeMillis()
+  // val startTime = System.currentTimeMillis()
   val in = new ReadScanner(System.in)
   val out = new java.io.PrintWriter(System.out)
 
@@ -35,12 +35,14 @@ object CF1076d extends App {
 
   def edgeToList(edges: Seq[(Int, Int, Long, Int)], direction: Boolean = false) : Seq[ListBuffer[(Int, Long, Int)]] = {
     val acc = Array.fill(n)(ListBuffer[(Int, Long, Int)]())
-    edges foreach ({case (x,y,w,i) =>
+    val it = edges.toIterator
+    while (it.hasNext) {
+      val (x,y,w,i) = it.next
       acc(x) += ((y, w, i))
       if (!direction) {
         acc(y) += ((x, w, i))
       }
-    })
+    }
     acc// map (_.toList)
   }
 
@@ -54,14 +56,16 @@ object CF1076d extends App {
     while (queue.nonEmpty) {
       val x = queue.dequeue
       set remove x
-      edges(x) foreach ({case (y, w, i) =>
+      val it = edges(x).toIterator
+      while (it.hasNext) {
+        val (y, w, i) = it.next
         if (result(x)._2 + w < result(y)._2) {
           result(y) = (x, result(x)._2 + w, i)
           if (set add y) {
             queue enqueue y
           }
         }
-      })
+      }
     }
     result
   }
@@ -80,27 +84,30 @@ object CF1076d extends App {
   }
 
   val (n, m, k) = (in.nextInt, in.nextInt, in.nextInt)
-  val edges = 1 to m map ((i) => {
+  val edges = ListBuffer[(Int, Int, Long, Int)]()
+  var i = 1
+  while (i <= m) {
     val (x, y, w) = (in.nextInt, in.nextInt, in.nextLong)
-    (x-1, y-1, w, i)
-  })
-  println("edges:", System.currentTimeMillis()-startTime)
+    edges += ((x-1, y-1, w, i))
+    i += 1
+  }
+  // println("edges:", System.currentTimeMillis()-startTime)
   // edges foreach (println(_))
 
   val nodeEdges = edgeToList(edges)
-  println("nodeEdges:", System.currentTimeMillis()-startTime)
+  // println("nodeEdges:", System.currentTimeMillis()-startTime)
   // nodeEdges foreach (println(_))
 
   val tree = shortest(n, nodeEdges)
-  println("spfa:", System.currentTimeMillis()-startTime)
+  // println("spfa:", System.currentTimeMillis()-startTime)
   // tree foreach println
 
   val remainEdges = bfs(tree, k)
-  println("bfs:", System.currentTimeMillis()-startTime)
+  // println("bfs:", System.currentTimeMillis()-startTime)
   // remainEdges foreach println
 
   out.println(remainEdges.length)
-  out.println(remainEdges.map(_._3).mkString(" ").length)
-  println("mkString:", System.currentTimeMillis()-startTime)
+  out.println(remainEdges.map(_._3).mkString(" "))
+  // println("mkString:", System.currentTimeMillis()-startTime)
   out.flush;out.close;
 }

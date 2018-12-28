@@ -66,7 +66,7 @@ void do_dfs(vector<long long>& result, int depth, int parent, int now, const nod
   // dump(prev_head);
   node head = prev_head;
   for (auto u : updates.at(now)) {
-    // cerr << "updating " << depth << depth+u.first << u.second << endl;
+    // cerr << "updating " << depth << " " << depth+u.first << " " << u.second << endl;
     update(head, depth, depth+u.first, u.second);
   }
   result[now] = query(head, depth);
@@ -84,25 +84,25 @@ vector<long long> dfs(int n, const map<int, vector<int>>& edges, const update_ty
 }
 
 int main() {
-  int n; cin>>n;
+  int n; scanf("%d", &n);
   map<int, vector<int>> edges;
   for (int i=0; i<n-1; i++) {
-    int x,y; cin>>x>>y; x--, y--;
+    int x,y; scanf("%d%d", &x, &y); x--, y--;
     edges[x].push_back(y);
     edges[y].push_back(x);
   }
-  int m; cin>>m;
+  int m; scanf("%d", &m);
   update_type updates;
   for (int i=0; i<n; i++) updates[i];
   for (int k=0; k<m; k++) {
-    int v,d,x; cin>>v>>d>>x; v--;
+    int v,d,x; scanf("%d%d%d", &v, &d, &x); v--;
     updates[v].push_back({d, x});
   }
   vector<long long> result = dfs(n, edges, updates);
-  cout << result[0];
+  printf("%lld", result[0]);
   for (int i=1; i<n; i++) {
-    cout << " " << result[i];
+    printf(" %lld", result[i]);
   }
-  cout << endl;
+  printf("\n");
   return 0;
 }

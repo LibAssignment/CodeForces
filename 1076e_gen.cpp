@@ -11,6 +11,6 @@ int main() {
   int m = n;
   cout << m << endl;
   for (int i = 0; i < m; i++) {
-    cout << rand()%n+1 << " " << rand()%500 << " " << rand() << endl;
+    cout << rand()%n+1 << " " << rand()%n*2/3 << " " << rand() << endl;
   }
 }

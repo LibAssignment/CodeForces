@@ -1,12 +1,12 @@
 #include <iostream>
 #include <vector>
-#include <unordered_map>
 #include <stack>
 #include <memory>
 
 using namespace std;
 
-typedef unordered_map<int, vector<pair<int, int>>> update_type;
+typedef vector<vector<pair<int, int>>> update_type;
+typedef vector<vector<int>> edge_type;
 
 struct node {
   shared_ptr<node> pl, pr;
@@ -60,7 +60,7 @@ void dump(const node& head) {
 }
 
 void do_dfs(vector<long long>& result, int depth, int parent, int now, const node& prev_head,
-            const unordered_map<int, vector<int>>& edges, const update_type& updates) {
+            const edge_type& edges, const update_type& updates) {
   // cerr << "dfs: " << now << endl;
   // dump(prev_head);
   node head = prev_head;
@@ -75,7 +75,7 @@ void do_dfs(vector<long long>& result, int depth, int parent, int now, const nod
   }
 }
 
-vector<long long> dfs(int n, const unordered_map<int, vector<int>>& edges, const update_type& updates) {
+vector<long long> dfs(int n, const edge_type& edges, const update_type& updates) {
   vector<long long> result(n, 0);
   auto head = make_node(0, n);
   do_dfs(result, 0, -1, 0, *head, edges, updates);
@@ -84,15 +84,14 @@ vector<long long> dfs(int n, const unordered_map<int, vector<int>>& edges, const
 
 int main() {
   int n; scanf("%d", &n);
-  unordered_map<int, vector<int>> edges;
+  edge_type edges(n);
   for (int i=0; i<n-1; i++) {
     int x,y; scanf("%d%d", &x, &y); x--, y--;
     edges[x].push_back(y);
     edges[y].push_back(x);
   }
   int m; scanf("%d", &m);
-  update_type updates;
-  for (int i=0; i<n; i++) updates[i];
+  update_type updates(n);
   for (int k=0; k<m; k++) {
     int v,d,x; scanf("%d%d%d", &v, &d, &x); v--;
     updates[v].push_back({d, x});
